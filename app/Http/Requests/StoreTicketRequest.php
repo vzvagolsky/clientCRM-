@@ -26,7 +26,7 @@ class StoreTicketRequest extends FormRequest
 
             // Attachments (если виджет отправляет файлы)
             'attachments' => ['sometimes', 'array', 'max:5'],
-            'attachments.*' => ['file', 'mimes:jpg,jpeg,png,pdf', 'max:5120'], // 5MB
+            'attachments.*' => ['file', 'mimes:jpg,jpeg,png,pdf', 'max:120000'], // 5MB
         ];
     }
 

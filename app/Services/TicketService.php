@@ -5,6 +5,8 @@ use App\Models\Ticket;
 use App\Repositories\CustomerRepository;
 use App\Repositories\TicketRepository;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Http\UploadedFile;
+
 
 class TicketService
 {
@@ -13,9 +15,9 @@ class TicketService
         private TicketRepository $tickets
     ) {}
 
-    public function createTicket(array $payload): Ticket
+    public function createTicket(array $payload, array $attachments = []): Ticket
     {
-        return DB::transaction(function () use ($payload) {
+        return DB::transaction(function () use ($payload, $attachments) {
 
             $customer = $this->customers->findOrCreateByContacts(
                 email: $payload['email'],
@@ -30,15 +32,11 @@ class TicketService
                 'status'      => 'new',
             ]);
 
-            // 🔹 Загрузка файлов
-            if (!empty($payload['attachments'])) {
-                foreach ($payload['attachments'] as $file) {
+            // ✅ Загрузка файлов (только реальные UploadedFile)
+            foreach ($attachments as $file) {
+                if ($file instanceof UploadedFile) {
                     $ticket->addMedia($file)->toMediaCollection('attachments');
                 }
-            }
-
-            if (!$ticket->exists) {
-                throw new \RuntimeException('Ticket was not saved');
             }
 
             return $ticket->load('customer', 'media');

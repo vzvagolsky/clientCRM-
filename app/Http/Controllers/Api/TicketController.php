@@ -16,22 +16,20 @@ class TicketController extends Controller
 	
     public function __construct(private TicketService $service) {}
 	
-	
-
-
    
-    public function store(StoreTicketRequest $request): JsonResponse
-    {
-        $ticket = $this->service->createTicket($request->validated());
+		public function store(StoreTicketRequest $request): JsonResponse
+       {
+    $data  = $request->validated();                 // текстовые поля
+    $files = $request->file('attachments', []);     // файлы отдельно
 
-        return (new TicketResource($ticket))
-            ->response()
-            ->setStatusCode(201);
-    }
-	 
-	
+    $ticket = $this->service->createTicket($data, $files);
+
+    return (new TicketResource($ticket))
+        ->response()
+        ->setStatusCode(201);
+      }
+		
    
-	 
 	 
 	
 }
